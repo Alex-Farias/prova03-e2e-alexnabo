@@ -1,21 +1,25 @@
-name: Build and Tests
+name: E2E Tests
 
 on:
   push:
     branches: [ master ]
   pull_request:
     branches: [ master ]
-  schedule:   
+  schedule:
     - cron: '0 12 * * *'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
     name: Run E2E Tests
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v5.0.0
-    - name: Use Node.js 21
-      uses: actions/setup-node@v6.0.0
+    - uses: actions/checkout@v6.0.3
+    - name: Use Node.js 22
+      uses: actions/setup-node@v6.3.0
       with:
         node-version: 22
         cache: 'npm'      
@@ -29,15 +33,15 @@ jobs:
     name: Run SonarCloud
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5.0.0
+      - uses: actions/checkout@v6.0.3
         with:
-          fetch-depth: 0  
+          fetch-depth: 0
       - name: Setup Node.js environment
-        uses: actions/setup-node@v6.0.0
+        uses: actions/setup-node@v6.3.0
         with:
-          node-version: 22 
+          node-version: 22
       - name: SonarCloud Scan
-        uses: SonarSource/sonarqube-scan-action@v6.0.0    
+        uses: SonarSource/sonarqube-scan-action@v7.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
